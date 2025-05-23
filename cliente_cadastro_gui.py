@@ -86,7 +86,6 @@ def insert_client_data(client_data):
 
         SELECT @Status AS Resultado; -- Return the status
         '''
-        # Ensure the order of values matches the order of parameters in the query
         values_to_insert = (
             client_data.get("XCLIENTES"), # For the EXISTS check
             client_data.get("NRECNO"),
@@ -108,16 +107,9 @@ def insert_client_data(client_data):
             client_data.get("EMAIL"),
             client_data.get("ZONA")
         )
-
+        
         cursor.execute(query, values_to_insert)
         conn.commit()
-
-        # Fetch the result from the SELECT statement
-        result = cursor.fetchone().Resultado
-        if result == 1:
-            return True
-        else:
-            return False
             
     except pyodbc.Error as e:
         messagebox.showerror("Database Error", f"An error occurred during insertion: {e}")
@@ -125,6 +117,7 @@ def insert_client_data(client_data):
     finally:
         if conn:
             conn.close()
+            return True
 
 def validate_fields(data):
     """
@@ -138,7 +131,10 @@ def validate_fields(data):
         if required and not value:
             errors.append(f"'{field}' is required.")
         elif value and len(value) > max_length:
-            errors.append(f"'{field}' exceeds the maximum length of {max_length} characters.")
+            if field == "LOGRA":
+                data[field] = value[:max_length]
+            else:
+                errors.append(f"'{field}' o campo passou do maximo de {max_length} characters.")
     return errors
 
 def handle_insert_client():
