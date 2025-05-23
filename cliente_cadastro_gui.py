@@ -110,14 +110,14 @@ def insert_client_data(client_data):
         
         cursor.execute(query, values_to_insert)
         conn.commit()
+        if conn:
+            conn.close()
+            return True
             
     except pyodbc.Error as e:
         messagebox.showerror("Database Error", f"An error occurred during insertion: {e}")
         return False
-    finally:
-        if conn:
-            conn.close()
-            return True
+
 
 def validate_fields(data):
     """
@@ -137,10 +137,32 @@ def validate_fields(data):
                 errors.append(f"'{field}' o campo passou do maximo de {max_length} characters.")
     return errors
 
+def get_next_xclientes():
+    """Retorna o próximo valor de XCLIENTES baseado no maior existente no banco."""
+    conn = connect_to_database()
+    if conn is None:
+        return None
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(CAST(XCLIENTES AS INT)) FROM SM11_PROD.dbo.FBCLIENTES")
+        result = cursor.fetchone()[0]
+        return str((int(result) + 1) if result is not None else 1)
+    except Exception as e:
+        messagebox.showerror("Database Error", f"Error fetching next XCLIENTES: {e}")
+        return None
+    finally:
+        conn.close()
+
 def handle_insert_client():
     """
     Coleta dados do formulário, valida-os e tenta inseri-los no banco de dados.
     """
+    next_xclientes = get_next_xclientes()
+    entry_widgets["XCLIENTES"].delete(0, ctk.END)
+    entry_widgets["XCLIENTES"].insert(0, next_xclientes)
+
+
     client_data = {field: entry_widgets[field].get().strip() for field in entry_widgets}
     client_data.update(INTERNAL_DEFAULT_FIELDS)
 
