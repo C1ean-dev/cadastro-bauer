@@ -8,7 +8,7 @@ import re
 
 FIELDS = [
     "NRECNO", "RAZAO", "CGC", "INSCRICAO", "CEP", "LOGRA", "ENDERECO", "NUMERO", "CJ", "BAIRRO",
-    "CIDADE", "ESTADO", "TEL1", "TEL2", "FAX", "EMAIL", "ZONA", "XCLIENTES",
+    "CIDADE", "ESTADO", "TEL1", "TEL2", "FAX", "EMAIL", "ZONA",
 ]
 
 INTERNAL_DEFAULT_FIELDS = {
@@ -28,7 +28,7 @@ DB_CONFIG = {
 
 VALIDATION_RULES = {
     "NRECNO": (10, False),
-    "RAZAO": (100, True),
+    "Cliente": (100, True),
     "CGC": (20, True),
     "INSCRICAO": (20, False),
     "LOGRA": (20, False),
@@ -158,10 +158,7 @@ def handle_insert_client():
     """
     Coleta dados do formulário, valida-os e tenta inseri-los no banco de dados.
     """
-    next_xclientes = get_next_xclientes()
-    entry_widgets["XCLIENTES"].delete(0, ctk.END)
-    entry_widgets["XCLIENTES"].insert(0, next_xclientes)
-
+    INTERNAL_DEFAULT_FIELDS["XCLIENTES"] = get_next_xclientes()
 
     client_data = {field: entry_widgets[field].get().strip() for field in entry_widgets}
     client_data.update(INTERNAL_DEFAULT_FIELDS)
@@ -172,10 +169,10 @@ def handle_insert_client():
         return
 
     if insert_client_data(client_data):
-        messagebox.showinfo("Success", "Client registered successfully!")
+        messagebox.showinfo("sucesso", "cliente registrado com sucesso!")
         clear_form_fields()
     else:
-        messagebox.showerror("Insertion Error", "Client with the provided 'XCLIENTES' already exists or an unknown error occurred.")
+        messagebox.showerror("Erro", "não foi possivel enviar.")
 
 def clear_form_fields():
     """Limpa todos os campos de entrada no formulário."""
