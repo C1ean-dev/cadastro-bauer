@@ -28,7 +28,7 @@ DB_CONFIG = {
 
 VALIDATION_RULES = {
     "NRECNO": (10, False),
-    "Cliente": (100, True),
+    "RAZAO": (100, True),
     "CGC": (20, True),
     "INSCRICAO": (20, False),
     "LOGRA": (20, False),
@@ -293,13 +293,13 @@ def setup_gui():
     button_frame.columnconfigure(1, weight=1)
     button_frame.columnconfigure(2, weight=1) # Added column for settings button
 
-    btn_register = ctk.CTkButton(button_frame, text="Register Client", command=handle_insert_client)
+    btn_register = ctk.CTkButton(button_frame, text="Register Client", command=handle_insert_client, fg_color="#1F6AA5", hover_color="#144870")
     btn_register.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-    btn_clear = ctk.CTkButton(button_frame, text="Clear All", command=clear_form_fields)
+    btn_clear = ctk.CTkButton(button_frame, text="Clear All", command=clear_form_fields, fg_color="#A51F1F", hover_color="#701414")
     btn_clear.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
-    btn_settings = ctk.CTkButton(button_frame, text="Settings", command=open_settings_window)
+    btn_settings = ctk.CTkButton(button_frame, text="Settings", command=open_settings_window, fg_color="#23A51F", hover_color="#147023")
     btn_settings.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
 
     app.mainloop()
