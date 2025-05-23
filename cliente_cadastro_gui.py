@@ -6,11 +6,6 @@ import requests
 import threading
 import re
 
-FIELDS = [
-    "NRECNO", "RAZAO", "CGC", "INSCRICAO", "CEP", "LOGRA", "ENDERECO", "NUMERO", "CJ", "BAIRRO",
-    "CIDADE", "ESTADO", "TEL1", "TEL2", "FAX", "EMAIL", "ZONA",
-]
-
 INTERNAL_DEFAULT_FIELDS = {
     "WORKFLOW_TYPE": "GENERAL",
     "APPROVAL_STATUS": "A",
@@ -26,26 +21,30 @@ DB_CONFIG = {
     'PWD': '*f4lc40$'
 }
 
-VALIDATION_RULES = {
-    "NRECNO": (10, False),
-    "RAZAO": (100, True),
-    "CGC": (20, True),
-    "INSCRICAO": (20, False),
-    "LOGRA": (20, False),
-    "ENDERECO": (250, False),
-    "NUMERO": (15, False),
-    "CJ": (250, False),
-    "BAIRRO": (60, False),
-    "CIDADE": (40, False),
-    "ESTADO": (10, False),
-    "CEP": (10, False),
-    "FAX": (23, False),
-    "TEL1": (23, False),
-    "TEL2": (23, False),
-    "EMAIL": (255, False),
-    "ZONA": (20, False),
-    "XCLIENTES": (10, True)
-}
+CLIENT_FIELDS_CONFIG = [
+    {"name": "NRECNO", "max_length": 10, "required": False, "db_column": "NRECNO"},
+    {"name": "RAZAO", "max_length": 100, "required": True, "db_column": "RAZAO"},
+    {"name": "CGC", "max_length": 20, "required": True, "db_column": "CGC"},
+    {"name": "INSCRICAO", "max_length": 20, "required": False, "db_column": "INSCRICAO"},
+    {"name": "LOGRA", "max_length": 20, "required": False, "db_column": "LOGRA"},
+    {"name": "ENDERECO", "max_length": 250, "required": False, "db_column": "ENDERECO"},
+    {"name": "NUMERO", "max_length": 15, "required": False, "db_column": "NUMERO"},
+    {"name": "CJ", "max_length": 250, "required": False, "db_column": "CJ"},
+    {"name": "BAIRRO", "max_length": 60, "required": False, "db_column": "BAIRRO"},
+    {"name": "CIDADE", "max_length": 40, "required": False, "db_column": "CIDADE"},
+    {"name": "ESTADO", "max_length": 10, "required": False, "db_column": "ESTADO"},
+    {"name": "CEP", "max_length": 10, "required": False, "db_column": "CEP"},
+    {"name": "FAX", "max_length": 23, "required": False, "db_column": "FAX"},
+    {"name": "TEL1", "max_length": 23, "required": False, "db_column": "TEL1"},
+    {"name": "TEL2", "max_length": 23, "required": False, "db_column": "TEL2"},
+    {"name": "EMAIL", "max_length": 255, "required": False, "db_column": "EMAIL"},
+    {"name": "ZONA", "max_length": 20, "required": False, "db_column": "ZONA"},
+    {"name": "XCLIENTES", "max_length": 10, "required": True, "db_column": "XCLIENTES"}
+]
+
+# Generate FIELDS and VALIDATION_RULES dynamically from CLIENT_FIELDS_CONFIG
+FIELDS = [field["name"] for field in CLIENT_FIELDS_CONFIG if field["name"] != "XCLIENTES"]
+VALIDATION_RULES = {field["name"]: (field["max_length"], field["required"]) for field in CLIENT_FIELDS_CONFIG}
 
 def connect_to_database():
     """Conecta ao banco de dados"""
@@ -68,15 +67,22 @@ def insert_client_data(client_data):
 
     try:
         cursor = conn.cursor()
-        query = '''
+
+        # Dynamically get column names for the INSERT statement, maintaining order from CLIENT_FIELDS_CONFIG
+        insert_columns = [field["db_column"] for field in CLIENT_FIELDS_CONFIG]
+        
+        # Prepare placeholders for the INSERT statement
+        placeholders = ', '.join(['?'] * len(insert_columns))
+        columns_str = ', '.join(insert_columns)
+
+        query = f'''
         DECLARE @Status INT;
 
         IF NOT EXISTS (SELECT 1 FROM SM11_PROD.dbo.FBCLIENTES WHERE XCLIENTES = ?)
             BEGIN
                 INSERT INTO SM11_PROD.dbo.FBCLIENTES
-                    (NRECNO, RAZAO, CGC, INSCRICAO, LOGRA, ENDERECO, NUMERO, CJ, BAIRRO, CIDADE,
-                    ESTADO, CEP, FAX, TEL1, TEL2, XCLIENTES, EMAIL, ZONA)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                    ({columns_str})
+                VALUES ({placeholders});
                 SET @Status = 1; -- Successfully inserted
             END
         ELSE
@@ -86,34 +92,13 @@ def insert_client_data(client_data):
 
         SELECT @Status AS Resultado; -- Return the status
         '''
-        values_to_insert = (
-            client_data.get("XCLIENTES"), # For the EXISTS check
-            client_data.get("NRECNO"),
-            client_data.get("RAZAO"),
-            client_data.get("CGC"),
-            client_data.get("INSCRICAO"),
-            client_data.get("LOGRA"),
-            client_data.get("ENDERECO"),
-            client_data.get("NUMERO"),
-            client_data.get("CJ"),
-            client_data.get("BAIRRO"),
-            client_data.get("CIDADE"),
-            client_data.get("ESTADO"),
-            client_data.get("CEP"),
-            client_data.get("FAX"),
-            client_data.get("TEL1"),
-            client_data.get("TEL2"),
-            client_data.get("XCLIENTES"), # For the INSERT statement
-            client_data.get("EMAIL"),
-            client_data.get("ZONA")
-        )
+        values_for_insert_statement = [client_data.get(field["name"]) for field in CLIENT_FIELDS_CONFIG]
+        
+        values_to_insert = (client_data.get("XCLIENTES"),) + tuple(values_for_insert_statement)
         
         cursor.execute(query, values_to_insert)
         conn.commit()
-        if conn:
-            conn.close()
-            return True
-            
+        return True
     except pyodbc.Error as e:
         messagebox.showerror("Database Error", f"An error occurred during insertion: {e}")
         return False
@@ -142,7 +127,6 @@ def get_next_xclientes():
     conn = connect_to_database()
     if conn is None:
         return None
-
     try:
         cursor = conn.cursor()
         cursor.execute("SELECT MAX(CAST(XCLIENTES AS INT)) FROM SM11_PROD.dbo.FBCLIENTES")
