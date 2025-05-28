@@ -74,10 +74,9 @@ def update_client_data(client_data):
 
         # Define as colunas a serem atualizadas
         update_columns = [field["db_column"] for field in CLIENT_FIELDS_CONFIG if field["name"] != "XCLIENTES"]
-        
         # Cria a string de placeholders para os valores de atualização
         placeholders = ', '.join([f"{col} = ?" for col in update_columns])
-
+        print("placerouder", placeholders)
         query = f'''
         DECLARE @Status INT;
 
@@ -98,19 +97,13 @@ def update_client_data(client_data):
         
         # Obtém os valores a serem atualizados (sem incluir o campo 'XCLIENTES' que é a chave)
         values_for_update_statement = [client_data.get(field["name"]) for field in CLIENT_FIELDS_CONFIG if field["name"] != "XCLIENTES"]
+        # Coloca o valor de XCLIENTES no início e no final dos valores para a atualização
+        values_to_update = (client_data.get("XCLIENTES"),) + tuple(values_for_update_statement) + (client_data.get("XCLIENTES"),)
         
-        # Coloca o valor de XCLIENTES no início dos valores para a atualização
-        values_to_update = tuple(values_for_update_statement) + (client_data.get("XCLIENTES"),)
+        print(cursor.execute(query, values_to_update))
+        print(conn.commit())
+        return True
         
-        cursor.execute(query, values_to_update)
-        conn.commit()
-
-        # Verifica se a atualização foi bem-sucedida
-        if cursor.fetchone()[0] == 1:
-            return True
-        else:
-            return False
-
     except pyodbc.Error as e:
         messagebox.showerror("Database Error", f"An error occurred during update: {e}")
         return False

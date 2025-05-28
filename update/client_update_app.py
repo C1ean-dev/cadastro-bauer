@@ -75,7 +75,9 @@ class ClientUpdateApp(ctk.CTkToplevel):
 
         client_data = get_client_data(identifier)
         if client_data:
+            
             self.populate_form_fields(client_data)
+
         else:
             messagebox.showwarning("Not Found", "Client not found.")
             self.clear_form_fields()
@@ -88,7 +90,6 @@ class ClientUpdateApp(ctk.CTkToplevel):
                 entry_widget.insert(0, str(data[db_column_name]))
         # Store the XCLIENTES for update operation
         self.current_xclientes = data.get(next((f["db_column"] for f in CLIENT_FIELDS_CONFIG if f["name"] == "XCLIENTES"), None))
-
 
     def handle_update_client(self):
         client_data = {field: self.entry_widgets[field].get().strip() for field in self.entry_widgets}
@@ -104,7 +105,6 @@ class ClientUpdateApp(ctk.CTkToplevel):
         if validation_errors:
             messagebox.showerror("Validation Error", "\n".join(validation_errors))
             return
-
         if update_client_data(client_data):
             messagebox.showinfo("Success", "Client updated successfully!")
         else:
