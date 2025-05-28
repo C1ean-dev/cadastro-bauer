@@ -1,16 +1,20 @@
 import customtkinter as ctk
 from tkinter import messagebox
-from cliente_cadastro_gui import ClientRegistrationApp
+from cadastro.client_registration_app import ClientRegistrationApp
+from utils.centerWindow import centerWindow
+from utils.config_manager import ConfigManager
 
 class MainMenuApp:
     def __init__(self, root):
+        self.config_manager = ConfigManager() # Create an instance
         self.root = root
         self.root.title("Menu Principal")
-        self.root.geometry("300x200")
+        self.root.geometry(centerWindow.center_window(self,root, self.config_manager.APP_SETTINGS["APP_WIDTH"], self.config_manager.APP_SETTINGS["APP_HEIGHT"]))
         ctk.set_appearance_mode("System")
         ctk.set_default_color_theme("blue")
 
         self.create_widgets()
+
 
     def create_widgets(self):
         # Botão Criar
@@ -30,16 +34,18 @@ class MainMenuApp:
         btn_delete.pack(pady=10)
 
     def open_create_client_screen(self):
-        # Hide the main menu window
+        # esconde o menu enquanto client estiver aberto
         self.root.withdraw()
         
-        # Open the client registration screen
+        # abre a tela do cliente 
         client_app = ClientRegistrationApp(self.root)
         client_app.protocol("WM_DELETE_WINDOW", lambda: self.on_client_app_close(client_app))
         
     def on_client_app_close(self, client_app_instance):
+        # quando o cliente fechar a tela destroi a instancia do cliente
         client_app_instance.destroy()
-        self.root.deiconify() # Show the main menu window again
+        # aber novamente o menu 
+        self.root.deiconify() 
 
     def open_read_client_screen(self):
         messagebox.showinfo("Ação", "Abrir tela de Ler Cliente")

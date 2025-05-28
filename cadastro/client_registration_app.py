@@ -1,0 +1,139 @@
+import customtkinter as ctk
+from tkinter import messagebox
+import sys
+import os
+
+
+# Add the parent directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from utils.db_operations import connect_to_database, insert_client_data
+from utils.validation_utils import validate_fields
+from utils.cep_integration import on_cep_focus_out, fill_address_fields
+from utils.settings_window import SettingsWindow
+from utils.centerWindow import centerWindow
+from utils.config_manager import ConfigManager
+
+config_manager = ConfigManager()
+
+class ClientRegistrationApp(ctk.CTkToplevel):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.title("Client Registration")
+        print(config_manager.APP_SETTINGS["APP_WIDTH"], config_manager.APP_SETTINGS["APP_HEIGHT"])
+        self.geometry(centerWindow.center_window(self, master, config_manager.APP_SETTINGS["APP_WIDTH"], config_manager.APP_SETTINGS["APP_HEIGHT"]))
+        self.grab_set() # Make it a modal window
+
+        # Configure grid weights for better resizing behavior
+        self.grid_columnconfigure(1, weight=1)
+
+        self.entry_widgets = {}
+        self.FIELDS = []
+        self.VALIDATION_RULES = {}
+        self.setup_gui_elements()
+
+    def update_field_and_validation_rules(self):
+        """Updates FIELDS and VALIDATION_RULES based on the current CLIENT_FIELDS_CONFIG."""
+        self.FIELDS = [field["name"] for field in config_manager.CLIENT_FIELDS_CONFIG if field["name"] != "XCLIENTES"]
+        self.VALIDATION_RULES = {field["name"]: (field["max_length"], field["required"]) for field in config_manager.CLIENT_FIELDS_CONFIG}
+
+    def setup_gui_elements(self):
+        # Clear existing widgets if any, for dynamic updates
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        # Reload configuration from config_manager before updating GUI elements
+        config_manager.app_config = config_manager._load_config() # Access the private method
+        config_manager.CLIENT_FIELDS_CONFIG = config_manager.app_config["CLIENT_FIELDS_CONFIG"]
+        config_manager.DB_CONFIG = config_manager.app_config["DB_CONFIG"]
+        # Re-initialize FIELDS and VALIDATION_RULES based on current CLIENT_FIELDS_CONFIG
+        self.update_field_and_validation_rules()
+
+        for idx, field in enumerate(self.FIELDS):
+            ctk.CTkLabel(self, text=f"{field}:").grid(row=idx, column=0, padx=10, pady=5, sticky=ctk.W)
+            entry = ctk.CTkEntry(self, width=300)
+            entry.grid(row=idx, column=1, padx=5, pady=5, sticky=ctk.EW)
+            self.entry_widgets[field] = entry
+
+        if "CEP" in self.entry_widgets:
+            self.entry_widgets["CEP"].bind("<FocusOut>", self.on_cep_focus_out_wrapper)
+        
+        # Frame for buttons
+        button_frame = ctk.CTkFrame(self)
+        button_frame.grid(row=len(self.FIELDS), column=0, columnspan=2, pady=20, sticky="nsew")
+        button_frame.columnconfigure(0, weight=1)
+        button_frame.columnconfigure(1, weight=1)
+        button_frame.columnconfigure(2, weight=1) # Added column for settings button
+
+        btn_register = ctk.CTkButton(button_frame, text="Register Client", command=self.handle_insert_client, fg_color="#1F6AA5", hover_color="#144870")
+        btn_register.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+
+        btn_clear = ctk.CTkButton(button_frame, text="Clear All", command=self.clear_form_fields, fg_color="#A51F1F", hover_color="#701414")
+        btn_clear.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+
+        btn_settings = ctk.CTkButton(button_frame, text="Settings", command=self.open_settings_window, fg_color="#23A51F", hover_color="#147023")
+        btn_settings.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
+
+    def get_next_xclientes(self):
+        """Retorna o próximo valor de XCLIENTES baseado no maior existente no banco."""
+        conn = connect_to_database()
+        if conn is None:
+            return None
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT MAX(CAST(XCLIENTES AS INT)) FROM SM11_PROD.dbo.FBCLIENTES")
+            result = cursor.fetchone()[0]
+            return str((int(result) + 1) if result is not None else 1)
+        except Exception as e:
+            messagebox.showerror("Database Error", f"Error fetching next XCLIENTES: {e}")
+            return None
+        finally:
+            if conn:
+                conn.close()
+
+    def handle_insert_client(self):
+        """
+        Coleta dados do formulário, valida-os e tenta inseri-los no banco de dados.
+        """
+        # Access INTERNAL_DEFAULT_FIELDS directly from the config_manager module
+        current_internal_defaults = config_manager.INTERNAL_DEFAULT_FIELDS.copy()
+        current_internal_defaults["XCLIENTES"] = self.get_next_xclientes()
+
+        client_data = {field: self.entry_widgets[field].get().strip() for field in self.entry_widgets}
+        client_data.update(current_internal_defaults)
+
+        validation_errors = validate_fields(client_data, self.VALIDATION_RULES)
+        if validation_errors:
+            messagebox.showerror("Validation Error", "\n".join(validation_errors))
+            return
+
+        if insert_client_data(client_data):
+            messagebox.showinfo("sucesso", "cliente registrado com sucesso!")
+            self.clear_form_fields()
+        else:
+            messagebox.showerror("Erro", "não foi possivel enviar.")
+
+    def clear_form_fields(self):
+        """Limpa todos os campos de entrada no formulário."""
+        for field in self.FIELDS:
+            if field in self.entry_widgets:
+                self.entry_widgets[field].delete(0, ctk.END)
+
+    def on_cep_focus_out_wrapper(self, event):
+        """Wrapper for on_cep_focus_out from cep_integration."""
+        on_cep_focus_out(
+            self.entry_widgets["CEP"],
+            lambda data: self.after(0, fill_address_fields, self.entry_widgets, data),
+            lambda title, msg: self.after(0, messagebox.showwarning, title, msg),
+            lambda title, msg: self.after(0, messagebox.showerror, title, msg)
+        )
+
+    def open_settings_window(self):
+        SettingsWindow(self, self.master, self.setup_gui_elements) # Dimensions are now pulled from config_manager
+
+
+if __name__ == "__main__":
+    master = ctk.CTk()
+    master.withdraw() # Hide the main window
+    app = ClientRegistrationApp(master)
+    master.mainloop()
