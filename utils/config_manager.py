@@ -44,12 +44,24 @@ class ConfigManager:
         "APP_HEIGHT": 750
     }
 
+    # Singleton pattern for ConfigManager
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(ConfigManager, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
     def __init__(self):
+        if self._initialized:
+            return
         self.app_config = self._load_config()
         self.CLIENT_FIELDS_CONFIG = self.app_config["CLIENT_FIELDS_CONFIG"]
         self.DB_CONFIG = self.app_config["DB_CONFIG"]
         self.INTERNAL_DEFAULT_FIELDS = self.app_config["INTERNAL_DEFAULT_FIELDS"]
         self.APP_SETTINGS = self.app_config["APP_SETTINGS"]
+        self._initialized = True
 
     def _load_config(self):
         """Loads configuration from app_config.json or returns defaults, merging new defaults if necessary."""
@@ -107,3 +119,14 @@ class ConfigManager:
             "APP_SETTINGS": self.APP_SETTINGS
         }
         self._save_config(self.app_config)
+
+# Create a single instance of ConfigManager and expose its attributes as module-level variables
+_module_config_manager = ConfigManager()
+CLIENT_FIELDS_CONFIG = _module_config_manager.CLIENT_FIELDS_CONFIG
+DB_CONFIG = _module_config_manager.DB_CONFIG
+INTERNAL_DEFAULT_FIELDS = _module_config_manager.INTERNAL_DEFAULT_FIELDS
+APP_SETTINGS = _module_config_manager.APP_SETTINGS
+
+# Expose the update and reset methods if needed
+update_and_save_config = _module_config_manager.update_and_save_config
+reset_config_to_defaults = _module_config_manager.reset_config_to_defaults

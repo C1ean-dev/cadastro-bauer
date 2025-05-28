@@ -1,6 +1,9 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from cadastro.client_registration_app import ClientRegistrationApp
+from update.client_update_app import ClientUpdateApp
+from delete.client_delete_app import ClientDeleteApp
+from read.client_read_app import ClientReadApp
 from utils.centerWindow import centerWindow
 from utils.config_manager import ConfigManager
 
@@ -48,13 +51,16 @@ class MainMenuApp:
         self.root.deiconify() 
 
     def open_read_client_screen(self):
-        messagebox.showinfo("Ação", "Abrir tela de Ler Cliente")
+        client_app = ClientReadApp(self.root)
+        client_app.protocol("WM_DELETE_WINDOW", lambda: self.on_client_app_close(client_app))
 
     def open_update_client_screen(self):
-        messagebox.showinfo("Ação", "Abrir tela de Atualizar Cliente")
+        client_app = ClientUpdateApp(self.root)
+        client_app.protocol("WM_DELETE_WINDOW", lambda: self.on_client_app_close(client_app))
 
     def open_delete_client_screen(self):
-        messagebox.showinfo("Ação", "Abrir tela de Deletar Cliente")
+        client_app = ClientDeleteApp(self.root)
+        client_app.protocol("WM_DELETE_WINDOW", lambda: self.on_client_app_close(client_app))
 
 if __name__ == "__main__":
     root = ctk.CTk()

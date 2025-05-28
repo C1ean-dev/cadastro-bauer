@@ -12,16 +12,14 @@ from utils.validation_utils import validate_fields
 from utils.cep_integration import on_cep_focus_out, fill_address_fields
 from utils.settings_window import SettingsWindow
 from utils.centerWindow import centerWindow
-from utils.config_manager import ConfigManager
-
-config_manager = ConfigManager()
+from utils.config_manager import APP_SETTINGS, CLIENT_FIELDS_CONFIG, INTERNAL_DEFAULT_FIELDS
 
 class ClientRegistrationApp(ctk.CTkToplevel):
     def __init__(self, master=None):
         super().__init__(master)
         self.title("Client Registration")
-        print(config_manager.APP_SETTINGS["APP_WIDTH"], config_manager.APP_SETTINGS["APP_HEIGHT"])
-        self.geometry(centerWindow.center_window(self, master, config_manager.APP_SETTINGS["APP_WIDTH"], config_manager.APP_SETTINGS["APP_HEIGHT"]))
+        print(APP_SETTINGS["APP_WIDTH"], APP_SETTINGS["APP_HEIGHT"])
+        self.geometry(centerWindow.center_window(self, master, APP_SETTINGS["APP_WIDTH"], APP_SETTINGS["APP_HEIGHT"]))
         self.grab_set() # Make it a modal window
 
         # Configure grid weights for better resizing behavior
@@ -34,18 +32,14 @@ class ClientRegistrationApp(ctk.CTkToplevel):
 
     def update_field_and_validation_rules(self):
         """Updates FIELDS and VALIDATION_RULES based on the current CLIENT_FIELDS_CONFIG."""
-        self.FIELDS = [field["name"] for field in config_manager.CLIENT_FIELDS_CONFIG if field["name"] != "XCLIENTES"]
-        self.VALIDATION_RULES = {field["name"]: (field["max_length"], field["required"]) for field in config_manager.CLIENT_FIELDS_CONFIG}
+        self.FIELDS = [field["name"] for field in CLIENT_FIELDS_CONFIG if field["name"] != "XCLIENTES"]
+        self.VALIDATION_RULES = {field["name"]: (field["max_length"], field["required"]) for field in CLIENT_FIELDS_CONFIG}
 
     def setup_gui_elements(self):
         # Clear existing widgets if any, for dynamic updates
         for widget in self.winfo_children():
             widget.destroy()
 
-        # Reload configuration from config_manager before updating GUI elements
-        config_manager.app_config = config_manager._load_config() # Access the private method
-        config_manager.CLIENT_FIELDS_CONFIG = config_manager.app_config["CLIENT_FIELDS_CONFIG"]
-        config_manager.DB_CONFIG = config_manager.app_config["DB_CONFIG"]
         # Re-initialize FIELDS and VALIDATION_RULES based on current CLIENT_FIELDS_CONFIG
         self.update_field_and_validation_rules()
 
@@ -95,8 +89,8 @@ class ClientRegistrationApp(ctk.CTkToplevel):
         """
         Coleta dados do formulário, valida-os e tenta inseri-los no banco de dados.
         """
-        # Access INTERNAL_DEFAULT_FIELDS directly from the config_manager module
-        current_internal_defaults = config_manager.INTERNAL_DEFAULT_FIELDS.copy()
+        # Access INTERNAL_DEFAULT_FIELDS directly from the module
+        current_internal_defaults = INTERNAL_DEFAULT_FIELDS.copy()
         current_internal_defaults["XCLIENTES"] = self.get_next_xclientes()
 
         client_data = {field: self.entry_widgets[field].get().strip() for field in self.entry_widgets}
