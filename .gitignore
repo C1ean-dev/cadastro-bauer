@@ -4,6 +4,9 @@ __pycache__/
 utils/__pycache__
 utils/__pycache__/
 utils/__pycache__/*
+utils/__pycache__/cep_integration.cpython-313.pyc
+utils/__pycache__/config_manager.cpython-313.pyc
+utils/__pycache__/db_operations.cpython-313.pyc
 *.py[cod]
 *$py.class
 
