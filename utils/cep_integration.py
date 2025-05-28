@@ -1,6 +1,7 @@
 import requests
 import threading
 import re
+import customtkinter as ctk
 
 def fetch_address_thread(cep, callback_success, callback_error):
     """Obtém detalhes de endereço da API ViaCEP em um thread para evitar travamentos na tela aguardando a API"""
