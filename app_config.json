@@ -1,0 +1,128 @@
+{
+    "CLIENT_FIELDS_CONFIG": [
+        {
+            "name": "NRECNO",
+            "max_length": 10,
+            "required": false,
+            "db_column": "NRECNO"
+        },
+        {
+            "name": "CLIENTE",
+            "max_length": 100,
+            "required": false,
+            "db_column": "RAZAO"
+        },
+        {
+            "name": "CGC",
+            "max_length": 20,
+            "required": false,
+            "db_column": "CGC"
+        },
+        {
+            "name": "INSCRICAO",
+            "max_length": 20,
+            "required": false,
+            "db_column": "INSCRICAO"
+        },
+        {
+            "name": "LOGRADOURO",
+            "max_length": 20,
+            "required": false,
+            "db_column": "LOGRA"
+        },
+        {
+            "name": "ENDERECO",
+            "max_length": 250,
+            "required": false,
+            "db_column": "ENDERECO"
+        },
+        {
+            "name": "NUMERO",
+            "max_length": 15,
+            "required": false,
+            "db_column": "NUMERO"
+        },
+        {
+            "name": "BAIRRO",
+            "max_length": 60,
+            "required": false,
+            "db_column": "BAIRRO"
+        },
+        {
+            "name": "CIDADE",
+            "max_length": 40,
+            "required": false,
+            "db_column": "CIDADE"
+        },
+        {
+            "name": "ESTADO",
+            "max_length": 10,
+            "required": false,
+            "db_column": "ESTADO"
+        },
+        {
+            "name": "CJ",
+            "max_length": 250,
+            "required": false,
+            "db_column": "CJ"
+        },
+        {
+            "name": "CEP",
+            "max_length": 10,
+            "required": false,
+            "db_column": "CEP"
+        },
+        {
+            "name": "FAX",
+            "max_length": 23,
+            "required": false,
+            "db_column": "FAX"
+        },
+        {
+            "name": "TEL1",
+            "max_length": 23,
+            "required": false,
+            "db_column": "TEL1"
+        },
+        {
+            "name": "TEL2",
+            "max_length": 23,
+            "required": false,
+            "db_column": "TEL2"
+        },
+        {
+            "name": "EMAIL",
+            "max_length": 255,
+            "required": false,
+            "db_column": "EMAIL"
+        },
+        {
+            "name": "ZONA",
+            "max_length": 20,
+            "required": false,
+            "db_column": "ZONA"
+        },
+        {
+            "name": "XCLIENTES",
+            "max_length": 10,
+            "required": true,
+            "db_column": "XCLIENTES"
+        }
+    ],
+    "DB_CONFIG": {
+        "DRIVER": "{ODBC Driver 17 for SQL Server}",
+        "SERVER": "192.168.4.17,1433",
+        "DATABASE": "SM11_PROD",
+        "UID": "sa",
+        "PWD": "*f4lc40$"
+    },
+    "INTERNAL_DEFAULT_FIELDS": {
+        "WORKFLOW_TYPE": "GENERAL",
+        "APPROVAL_STATUS": "A",
+        "ADIMPLENTE": "T"
+    },
+    "APP_SETTINGS": {
+        "APP_WIDTH": 800,
+        "APP_HEIGHT": 750
+    }
+}

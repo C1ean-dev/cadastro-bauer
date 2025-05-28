@@ -25,7 +25,7 @@ class ClientDeleteApp(ctk.CTkToplevel):
         for widget in self.winfo_children():
             widget.destroy()
 
-        ctk.CTkLabel(self, text="NRECNO or CGC:").grid(row=0, column=0, padx=10, pady=5, sticky=ctk.W)
+        ctk.CTkLabel(self, text="Search by XCLIENTES, CGC, Name, or Inscrição:").grid(row=0, column=0, padx=10, pady=5, sticky=ctk.W)
         entry = ctk.CTkEntry(self, width=300)
         entry.grid(row=0, column=1, padx=5, pady=5, sticky=ctk.EW)
         self.entry_widgets["identifier"] = entry
@@ -40,7 +40,7 @@ class ClientDeleteApp(ctk.CTkToplevel):
     def handle_delete_client(self):
         identifier = self.entry_widgets["identifier"].get().strip()
         if not identifier:
-            messagebox.showerror("Input Error", "Please enter NRECNO or CGC to delete.")
+            messagebox.showerror("Input Error", "Please enter XCLIENTES, CGC, Name, or Inscrição to delete.")
             return
 
         if delete_client_data(identifier):

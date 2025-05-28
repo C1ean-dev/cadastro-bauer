@@ -30,7 +30,7 @@ class ClientReadApp(ctk.CTkToplevel):
             widget.destroy()
 
         # Search section
-        ctk.CTkLabel(self, text="Search by NRECNO or CGC:").grid(row=0, column=0, padx=10, pady=5, sticky=ctk.W)
+        ctk.CTkLabel(self, text="Search by XCLIENTES, CGC, Name, or Inscrição:").grid(row=0, column=0, padx=10, pady=5, sticky=ctk.W)
         self.search_entry = ctk.CTkEntry(self, width=300)
         self.search_entry.grid(row=0, column=1, padx=5, pady=5, sticky=ctk.EW)
         btn_search = ctk.CTkButton(self, text="Search", command=self.search_client)
@@ -56,7 +56,6 @@ class ClientReadApp(ctk.CTkToplevel):
         client_data = get_client_data(identifier)
         if client_data:
             self.populate_display_fields(client_data)
-            messagebox.showinfo("Success", "Client data loaded.")
         else:
             messagebox.showwarning("Not Found", "Client not found.")
             self.clear_display_fields()

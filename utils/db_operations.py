@@ -120,7 +120,7 @@ def update_client_data(client_data):
 
 def delete_client_data(identifier):
     """
-    Deletes a client from the FBCLIENTES table based on NRECNO or CGC.
+    Deletes a client from the FBCLIENTES table based on XCLIENTES.
     Returns True on successful deletion, False otherwise.
     """
     conn = connect_to_database()
@@ -129,17 +129,16 @@ def delete_client_data(identifier):
 
     try:
         cursor = conn.cursor()
-        # Try to delete by NRECNO first (assuming it's numeric)
-        cursor.execute("DELETE FROM SM11_PROD.dbo.FBCLIENTES WHERE NRECNO = ?", identifier)
-        rows_affected = cursor.rowcount
-        
-        if rows_affected == 0:
-            # If no rows deleted by NRECNO, try by CGC
-            cursor.execute("DELETE FROM SM11_PROD.dbo.FBCLIENTES WHERE CGC = ?", identifier)
+        # First, try to get the client data using the identifier
+        client_to_delete = get_client_data(identifier)
+        if client_to_delete and "XCLIENTES" in client_to_delete:
+            xclientes_to_delete = client_to_delete["XCLIENTES"]
+            cursor.execute("DELETE FROM SM11_PROD.dbo.FBCLIENTES WHERE XCLIENTES = ?", xclientes_to_delete)
             rows_affected = cursor.rowcount
-
-        conn.commit()
-        return rows_affected > 0
+            conn.commit()
+            return rows_affected > 0
+        else:
+            return False # Client not found or XCLIENTES not available
     except pyodbc.Error as e:
         messagebox.showerror("Database Error", f"An error occurred during deletion: {e}")
         return False
@@ -149,7 +148,7 @@ def delete_client_data(identifier):
 
 def get_client_data(identifier):
     """
-    Fetches client data from the FBCLIENTES table based on XCLIENTES or NAME.
+    Fetches client data from the FBCLIENTES table based on XCLIENTES, CGC, RAZAO, or INSCRICAO.
     Returns a dictionary of client data if found, None otherwise.
     """
     conn = connect_to_database()
@@ -158,14 +157,25 @@ def get_client_data(identifier):
 
     try:
         cursor = conn.cursor()
+        client_row = None
         
-        # Try to fetch by NRECNO first
+        # Try to fetch by XCLIENTES
         cursor.execute("SELECT * FROM SM11_PROD.dbo.FBCLIENTES WHERE XCLIENTES = ?", identifier)
         client_row = cursor.fetchone()
 
         if client_row is None:
-            # If not found by NRECNO, try by CGC
-            cursor.execute("SELECT * FROM SM11_PROD.dbo.FBCLIENTES WHERE NAME = ?", identifier)
+            # Try to fetch by CGC
+            cursor.execute("SELECT * FROM SM11_PROD.dbo.FBCLIENTES WHERE CGC = ?", identifier)
+            client_row = cursor.fetchone()
+
+        if client_row is None:
+            # Try to fetch by RAZAO (Name)
+            cursor.execute("SELECT * FROM SM11_PROD.dbo.FBCLIENTES WHERE RAZAO LIKE ?", f"%{identifier}%")
+            client_row = cursor.fetchone()
+
+        if client_row is None:
+            # Try to fetch by INSCRICAO
+            cursor.execute("SELECT * FROM SM11_PROD.dbo.FBCLIENTES WHERE INSCRICAO = ?", identifier)
             client_row = cursor.fetchone()
 
         if client_row:
