@@ -31,7 +31,7 @@ class ClientUpdateGUI(ctk.CTkToplevel):
         for widget in self.winfo_children():
             widget.destroy()
 
-        ctk.CTkLabel(self, text="Search by XCLIENTES, CGC, Name, or Inscrição:").grid(row=0, column=0, padx=10, pady=5, sticky=ctk.W)
+        ctk.CTkLabel(self, text="Search by ID:").grid(row=0, column=0, padx=10, pady=5, sticky=ctk.W)
         self.search_entry = ctk.CTkEntry(self, width=300)
         self.search_entry.grid(row=0, column=1, padx=5, pady=5, sticky=ctk.EW)
         btn_search = ctk.CTkButton(self, text="Search", command=self.search_client)
