@@ -20,20 +20,24 @@ class MainMenuApp:
 
 
     def create_widgets(self):
+        # Create a frame to hold the buttons
+        button_frame = ctk.CTkFrame(self.root)
+        button_frame.pack(expand=True, fill='both', pady=20) # Center the frame and make it expand
+
         # Botão Criar
-        btn_create = ctk.CTkButton(self.root, text="Criar Cliente", command=self.open_create_client_screen)
+        btn_create = ctk.CTkButton(button_frame, text="Criar Cliente", command=self.open_create_client_screen)
         btn_create.pack(pady=10)
 
         # Botão Ler
-        btn_read = ctk.CTkButton(self.root, text="Ler Cliente", command=self.open_read_client_screen)
+        btn_read = ctk.CTkButton(button_frame, text="Ler Cliente", command=self.open_read_client_screen)
         btn_read.pack(pady=10)
 
         # Botão Atualizar
-        btn_update = ctk.CTkButton(self.root, text="Atualizar Cliente", command=self.open_update_client_screen)
+        btn_update = ctk.CTkButton(button_frame, text="Atualizar Cliente", command=self.open_update_client_screen)
         btn_update.pack(pady=10)
 
         # Botão Deletar
-        btn_delete = ctk.CTkButton(self.root, text="Deletar Cliente", command=self.open_delete_client_screen)
+        btn_delete = ctk.CTkButton(button_frame, text="Deletar Cliente", command=self.open_delete_client_screen)
         btn_delete.pack(pady=10)
 
     def open_create_client_screen(self):
