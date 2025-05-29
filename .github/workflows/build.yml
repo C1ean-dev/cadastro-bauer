@@ -27,7 +27,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Create version file
-        run: echo "__version__ = 'v${{ github.run_number }}'" > cadastro-bauer/version.py
+        run: echo "__version__ = 'v${{ github.run_number }}'" > version.py
 
       - name: Build with PyInstaller
         run: pyinstaller --onefile --noconsole --name "cadastro" cadastro-bauer\main_menu.py
