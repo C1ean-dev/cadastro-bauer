@@ -3,6 +3,9 @@ name: Build and Release
 on:
   push:
     branches: [main]
+    
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -32,4 +35,4 @@ jobs:
           tag_name: "v${{ github.run_number }}"
           files: dist/cadastro.exe
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
