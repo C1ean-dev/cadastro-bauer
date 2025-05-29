@@ -30,7 +30,7 @@ jobs:
         run: echo "__version__ = 'v${{ github.run_number }}'" > version.py
 
       - name: Build with PyInstaller
-        run: pyinstaller --onefile --noconsole --name "cadastro" cadastro-bauer\main_menu.py
+        run: pyinstaller --onefile --noconsole --name "cadastro" main_menu.py
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
