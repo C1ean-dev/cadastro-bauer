@@ -6,6 +6,7 @@ from delete.client_delete_app import ClientDeleteApp
 from read.client_read_app import ClientReadApp
 from utils.centerWindow import centerWindow
 from utils.config_manager import ConfigManager
+from utils.updater import AppUpdater # Import the updater
 
 class MainMenuApp:
     def __init__(self, root):
@@ -15,6 +16,22 @@ class MainMenuApp:
         self.root.geometry(centerWindow.center_window(self,root, self.config_manager.APP_SETTINGS["APP_WIDTH"], self.config_manager.APP_SETTINGS["APP_HEIGHT"]))
         ctk.set_appearance_mode("System")
         ctk.set_default_color_theme("blue")
+
+        # Initialize and check for updates
+        current_app_version = "0.0.0-dev" # Default to development version
+        try:
+            import version
+            current_app_version = version.__version__
+            # Only run updater if a proper version is found (i.e., not in local dev)
+            self.updater = AppUpdater(
+                repo_owner="C1ean-dev", 
+                repo_name="cadastro-bauer", 
+                current_version=current_app_version
+            )
+            self.updater.check_for_updates()
+        except ImportError:
+            print("Warning: version.py not found. Running in development mode, update checks skipped.")
+            # No updater initialized if in development mode
 
         self.create_widgets()
 

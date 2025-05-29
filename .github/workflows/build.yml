@@ -26,8 +26,11 @@ jobs:
           pip install pyinstaller
           pip install -r requirements.txt
 
+      - name: Create version file
+        run: echo "__version__ = 'v${{ github.run_number }}'" > cadastro-bauer/version.py
+
       - name: Build with PyInstaller
-        run: pyinstaller --onefile --noconsole --name "cadastro" .\main_menu.py
+        run: pyinstaller --onefile --noconsole --name "cadastro" cadastro-bauer\main_menu.py
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
