@@ -1,6 +1,16 @@
 import pyodbc
 from tkinter import messagebox
 from utils.config_manager import DB_CONFIG, CLIENT_FIELDS_CONFIG, INTERNAL_DEFAULT_FIELDS
+from datetime import datetime
+
+def log_operation(operation_type, client_id, before_data=None, after_data=None):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_entry = f"[{timestamp}] Operation: {operation_type}, Client ID: {client_id}"
+    if before_data:
+        log_entry += f", Before: {before_data}"
+    if after_data:
+        log_entry += f", After: {after_data}"
+    print(log_entry) # For now, print to console. Can be extended to file logging.
 
 def connect_to_database():
     """Conecta ao banco de dados"""
@@ -69,6 +79,9 @@ def update_client_data(client_data):
     if conn is None:
         return False
 
+    client_id = client_data.get("XCLIENTES")
+    before_data = get_client_data(client_id) # Fetch current data before update
+
     try:
         cursor = conn.cursor()
 
@@ -100,8 +113,12 @@ def update_client_data(client_data):
         # Coloca o valor de XCLIENTES no início e no final dos valores para a atualização
         values_to_update = (client_data.get("XCLIENTES"),) + tuple(values_for_update_statement) + (client_data.get("XCLIENTES"),)
         
-        print(cursor.execute(query, values_to_update))
-        print(conn.commit())
+        cursor.execute(query, values_to_update)
+        conn.commit()
+
+        # Log the update operation
+        log_operation("Update", client_id, before_data=before_data, after_data=client_data)
+        
         return True
         
     except pyodbc.Error as e:
@@ -120,16 +137,23 @@ def delete_client_data(identifier):
     if conn is None:
         return False
 
+    client_id = identifier
+    before_data = get_client_data(client_id) # Fetch current data before deletion
+
     try:
         cursor = conn.cursor()
         # First, try to get the client data using the identifier
-        client_to_delete = get_client_data(identifier)
-        if client_to_delete and "XCLIENTES" in client_to_delete:
-            xclientes_to_delete = client_to_delete["XCLIENTES"]
+        if before_data and "XCLIENTES" in before_data:
+            xclientes_to_delete = before_data["XCLIENTES"]
             cursor.execute("DELETE FROM SM11_PROD.dbo.FBCLIENTES WHERE XCLIENTES = ?", xclientes_to_delete)
             rows_affected = cursor.rowcount
             conn.commit()
-            return rows_affected > 0
+            
+            if rows_affected > 0:
+                log_operation("Delete", client_id, before_data=before_data)
+                return True
+            else:
+                return False # Client not found or XCLIENTES not available
         else:
             return False # Client not found or XCLIENTES not available
     except pyodbc.Error as e:

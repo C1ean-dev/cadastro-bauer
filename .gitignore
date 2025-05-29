@@ -9,6 +9,7 @@ utils/__pycache__/config_manager.cpython-313.pyc
 utils/__pycache__/db_operations.cpython-313.pyc
 *.py[cod]
 *$py.class
+password.txt
 
 # C extensions
 *.so

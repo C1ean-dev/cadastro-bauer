@@ -40,6 +40,7 @@ class MainMenuApp:
         btn_delete = ctk.CTkButton(button_frame, text="Deletar Cliente", command=self.open_delete_client_screen)
         btn_delete.pack(pady=10)
 
+
     def open_create_client_screen(self):
         # esconde o menu enquanto client estiver aberto
         self.root.withdraw()
@@ -65,6 +66,7 @@ class MainMenuApp:
     def open_delete_client_screen(self):
         client_app = ClientDeleteApp(self.root)
         client_app.protocol("WM_DELETE_WINDOW", lambda: self.on_client_app_close(client_app))
+
 
 if __name__ == "__main__":
     root = ctk.CTk()

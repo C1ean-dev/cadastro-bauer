@@ -9,13 +9,13 @@
         {
             "name": "CLIENTE",
             "max_length": 100,
-            "required": false,
+            "required": true,
             "db_column": "RAZAO"
         },
         {
             "name": "CGC",
             "max_length": 20,
-            "required": false,
+            "required": true,
             "db_column": "CGC"
         },
         {
@@ -111,10 +111,10 @@
     ],
     "DB_CONFIG": {
         "DRIVER": "{ODBC Driver 17 for SQL Server}",
-        "SERVER": "bauer029.corp.br",
+        "SERVER": "192.168.4.17,1433",
         "DATABASE": "SM11_PROD",
-        "UID": "lims",
-        "PWD": "0j39d4dp1"
+        "UID": "sa",
+        "PWD": "*f4lc40$"
     },
     "INTERNAL_DEFAULT_FIELDS": {
         "WORKFLOW_TYPE": "GENERAL",
