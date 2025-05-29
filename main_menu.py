@@ -7,6 +7,7 @@ from read.client_read_app import ClientReadApp
 from utils.centerWindow import centerWindow
 from utils.config_manager import ConfigManager
 from utils.updater import AppUpdater # Import the updater
+from utils.settings_window import SettingsWindow # Import SettingsWindow
 
 class MainMenuApp:
     def __init__(self, root):
@@ -56,6 +57,10 @@ class MainMenuApp:
         btn_delete = ctk.CTkButton(button_frame, text="Deletar Cliente", command=self.open_delete_client_screen)
         btn_delete.pack(pady=10)
 
+        # Botão Configurações
+        btn_settings = ctk.CTkButton(button_frame, text="Configurações", command=self.open_settings_screen)
+        btn_settings.pack(pady=10)
+
 
     def open_create_client_screen(self):
         # esconde o menu enquanto client estiver aberto
@@ -82,6 +87,11 @@ class MainMenuApp:
     def open_delete_client_screen(self):
         client_app = ClientDeleteApp(self.root)
         client_app.protocol("WM_DELETE_WINDOW", lambda: self.on_client_app_close(client_app))
+
+    def open_settings_screen(self):
+        # Pass self.root as master and a dummy function for on_close_callback if not needed
+        settings_window = SettingsWindow(self.root, self.root, lambda: None) 
+        settings_window.protocol("WM_DELETE_WINDOW", lambda: self.on_client_app_close(settings_window))
 
 
 if __name__ == "__main__":

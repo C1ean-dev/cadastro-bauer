@@ -53,16 +53,14 @@ class ClientRegistrationGUI(ctk.CTkToplevel):
         button_frame.grid(row=len(self.FIELDS), column=0, columnspan=2, pady=20, sticky="nsew")
         button_frame.columnconfigure(0, weight=1)
         button_frame.columnconfigure(1, weight=1)
-        button_frame.columnconfigure(2, weight=1) # Added column for settings button
+        # Removed column for settings button as it's moved to main menu
+        button_frame.columnconfigure(2, weight=0) 
 
         btn_register = ctk.CTkButton(button_frame, text="Register Client", command=self.handle_insert_client, fg_color="#1F6AA5", hover_color="#144870")
         btn_register.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
         btn_clear = ctk.CTkButton(button_frame, text="Clear All", command=self.clear_form_fields, fg_color="#A51F1F", hover_color="#701414")
         btn_clear.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
-
-        btn_settings = ctk.CTkButton(button_frame, text="Settings", command=self.open_settings_window, fg_color="#23A51F", hover_color="#147023")
-        btn_settings.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
 
     def clear_form_fields(self):
         """Limpa todos os campos de entrada no formulário."""
@@ -78,6 +76,3 @@ class ClientRegistrationGUI(ctk.CTkToplevel):
             lambda title, msg: self.after(0, messagebox.showwarning, title, msg),
             lambda title, msg: self.after(0, messagebox.showerror, title, msg)
         )
-
-    def open_settings_window(self):
-        SettingsWindow(self, self.master, self.setup_gui_elements) # Dimensions are now pulled from config_manager
