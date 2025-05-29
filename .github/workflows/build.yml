@@ -2,7 +2,7 @@ name: Build and Release
 
 on:
   push:
-    branches: [main]  # ou 'master', dependendo do nome correto da sua branch
+    branches: [main]
 
 jobs:
   build:
