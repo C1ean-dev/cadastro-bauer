@@ -18,7 +18,6 @@ class MainMenuApp:
 
         self.create_widgets()
 
-
     def create_widgets(self):
         # Create a frame to hold the buttons
         button_frame = ctk.CTkFrame(self.root)
