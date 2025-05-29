@@ -7,14 +7,15 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils.centerWindow import centerWindow
-from utils.config_manager import APP_SETTINGS
+from utils.config_manager import ConfigManager # Import the class
 from utils.log_viewer_app import LogViewerApp
 
 class ClientDeleteGUI(ctk.CTkToplevel):
     def __init__(self, root=None):
         super().__init__(root)
+        self.config_manager = ConfigManager() # Get the singleton instance
         self.title("Delete Client")
-        self.geometry(centerWindow.center_window(self, root, APP_SETTINGS["APP_WIDTH"], APP_SETTINGS["APP_HEIGHT"]))
+        self.geometry(centerWindow.center_window(self, root, self.config_manager.APP_SETTINGS["APP_WIDTH"], self.config_manager.APP_SETTINGS["APP_HEIGHT"]))
         self.grab_set()
 
         self.grid_columnconfigure(1, weight=1)

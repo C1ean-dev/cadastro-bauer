@@ -8,14 +8,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils.cep_integration import on_cep_focus_out, fill_address_fields
 from utils.centerWindow import centerWindow
-from utils.config_manager import APP_SETTINGS, CLIENT_FIELDS_CONFIG
+from utils.config_manager import ConfigManager # Import the class
 from utils.log_viewer_app import LogViewerApp
 
 class ClientUpdateGUI(ctk.CTkToplevel):
     def __init__(self, root=None):
         super().__init__(root)
+        self.config_manager = ConfigManager() # Get the singleton instance
         self.title("Update Client")
-        self.geometry(centerWindow.center_window(self, root, APP_SETTINGS["APP_WIDTH"], APP_SETTINGS["APP_HEIGHT"]))
+        self.geometry(centerWindow.center_window(self, root, self.config_manager.APP_SETTINGS["APP_WIDTH"], self.config_manager.APP_SETTINGS["APP_HEIGHT"]))
         self.grab_set()
 
         self.grid_columnconfigure(1, weight=1)
@@ -26,8 +27,8 @@ class ClientUpdateGUI(ctk.CTkToplevel):
         self.setup_gui_elements()
 
     def update_field_and_validation_rules(self):
-        self.FIELDS = [field["name"] for field in CLIENT_FIELDS_CONFIG if field["name"] != "XCLIENTES"]
-        self.VALIDATION_RULES = {field["name"]: (field["max_length"], field["required"]) for field in CLIENT_FIELDS_CONFIG}
+        self.FIELDS = [field["name"] for field in self.config_manager.CLIENT_FIELDS_CONFIG if field["name"] != "XCLIENTES"]
+        self.VALIDATION_RULES = {field["name"]: (field["max_length"], field["required"]) for field in self.config_manager.CLIENT_FIELDS_CONFIG}
 
     def setup_gui_elements(self):
         for widget in self.winfo_children():
@@ -91,7 +92,7 @@ class ClientUpdateGUI(ctk.CTkToplevel):
     def populate_form_fields(self, data):
         self.clear_form_fields() # This will also uncheck checkboxes and enable entries
         for field_name, entry_widget in self.entry_widgets.items():
-            db_column_name = next((f["db_column"] for f in CLIENT_FIELDS_CONFIG if f["name"] == field_name), None)
+            db_column_name = next((f["db_column"] for f in self.config_manager.CLIENT_FIELDS_CONFIG if f["name"] == field_name), None)
             if db_column_name and db_column_name in data:
                 entry_widget.insert(0, str(data[db_column_name]))
             # After populating, ensure the state is correct based on checkbox (should be unchecked)

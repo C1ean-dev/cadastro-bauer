@@ -7,13 +7,14 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils.centerWindow import centerWindow
-from utils.config_manager import APP_SETTINGS, CLIENT_FIELDS_CONFIG
+from utils.config_manager import ConfigManager # Import the class
 
 class ClientReadGUI(ctk.CTkToplevel):
     def __init__(self, root=None):
         super().__init__(root)
+        self.config_manager = ConfigManager() # Get the singleton instance
         self.title("Read Client Data")
-        self.geometry(centerWindow.center_window(self, root, APP_SETTINGS["APP_WIDTH"], APP_SETTINGS["APP_HEIGHT"]))
+        self.geometry(centerWindow.center_window(self, root, self.config_manager.APP_SETTINGS["APP_WIDTH"], self.config_manager.APP_SETTINGS["APP_HEIGHT"]))
         self.grab_set()
 
         self.grid_columnconfigure(1, weight=1)
@@ -22,7 +23,7 @@ class ClientReadGUI(ctk.CTkToplevel):
         self.setup_gui_elements()
 
     def update_field_list(self):
-        self.FIELDS = [field["name"] for field in CLIENT_FIELDS_CONFIG]
+        self.FIELDS = [field["name"] for field in self.config_manager.CLIENT_FIELDS_CONFIG]
 
     def setup_gui_elements(self):
         for widget in self.winfo_children():
@@ -47,7 +48,7 @@ class ClientReadGUI(ctk.CTkToplevel):
     def populate_display_fields(self, data):
         self.clear_display_fields()
         for field_name, display_label in self.display_widgets.items():
-            db_column_name = next((f["db_column"] for f in CLIENT_FIELDS_CONFIG if f["name"] == field_name), None)
+            db_column_name = next((f["db_column"] for f in self.config_manager.CLIENT_FIELDS_CONFIG if f["name"] == field_name), None)
             if db_column_name and db_column_name in data:
                 display_label.configure(text=str(data[db_column_name]))
 

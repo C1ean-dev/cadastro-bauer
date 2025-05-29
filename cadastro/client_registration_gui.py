@@ -9,13 +9,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.cep_integration import on_cep_focus_out, fill_address_fields
 from utils.settings_window import SettingsWindow
 from utils.centerWindow import centerWindow
-from utils.config_manager import APP_SETTINGS, CLIENT_FIELDS_CONFIG
+from utils.config_manager import ConfigManager # Import the class
 
 class ClientRegistrationGUI(ctk.CTkToplevel):
     def __init__(self, master=None):
         super().__init__(master)
+        self.config_manager = ConfigManager() # Get the singleton instance
         self.title("Client Registration")
-        self.geometry(centerWindow.center_window(self, master, APP_SETTINGS["APP_WIDTH"], APP_SETTINGS["APP_HEIGHT"]))
+        self.geometry(centerWindow.center_window(self, master, self.config_manager.APP_SETTINGS["APP_WIDTH"], self.config_manager.APP_SETTINGS["APP_HEIGHT"]))
         self.grab_set() # Make it a modal window
 
         # Configure grid weights for better resizing behavior
@@ -28,8 +29,8 @@ class ClientRegistrationGUI(ctk.CTkToplevel):
 
     def update_field_and_validation_rules(self):
         """Updates FIELDS and VALIDATION_RULES based on the current CLIENT_FIELDS_CONFIG."""
-        self.FIELDS = [field["name"] for field in CLIENT_FIELDS_CONFIG if field["name"] != "XCLIENTES"]
-        self.VALIDATION_RULES = {field["name"]: (field["max_length"], field["required"]) for field in CLIENT_FIELDS_CONFIG}
+        self.FIELDS = [field["name"] for field in self.config_manager.CLIENT_FIELDS_CONFIG if field["name"] != "XCLIENTES"]
+        self.VALIDATION_RULES = {field["name"]: (field["max_length"], field["required"]) for field in self.config_manager.CLIENT_FIELDS_CONFIG}
 
     def setup_gui_elements(self):
         # Clear existing widgets if any, for dynamic updates

@@ -42,24 +42,29 @@ class MainMenuApp:
         button_frame.pack(expand=True, fill='both', pady=20) # Center the frame and make it expand
 
         # Botão Criar
-        btn_create = ctk.CTkButton(button_frame, text="Criar Cliente", command=self.open_create_client_screen)
-        btn_create.pack(pady=10)
+        btn_create = ctk.CTkButton(button_frame, text="Criar Cliente", command=self.open_create_client_screen,
+                                   fg_color="#28a745", hover_color="#218838")
+        btn_create.pack(pady=10, fill='x', padx=20)
 
         # Botão Ler
-        btn_read = ctk.CTkButton(button_frame, text="Ler Cliente", command=self.open_read_client_screen)
-        btn_read.pack(pady=10)
+        btn_read = ctk.CTkButton(button_frame, text="Ler Cliente", command=self.open_read_client_screen,
+                                 fg_color="#007bff", hover_color="#0056b3")
+        btn_read.pack(pady=10, fill='x', padx=20)
 
         # Botão Atualizar
-        btn_update = ctk.CTkButton(button_frame, text="Atualizar Cliente", command=self.open_update_client_screen)
-        btn_update.pack(pady=10)
+        btn_update = ctk.CTkButton(button_frame, text="Atualizar Cliente", command=self.open_update_client_screen,
+                                   fg_color="#9c07ff", hover_color="#41016b") 
+        btn_update.pack(pady=10, fill='x', padx=20)
 
         # Botão Deletar
-        btn_delete = ctk.CTkButton(button_frame, text="Deletar Cliente", command=self.open_delete_client_screen)
-        btn_delete.pack(pady=10)
+        btn_delete = ctk.CTkButton(button_frame, text="Deletar Cliente", command=self.open_delete_client_screen,
+                                   fg_color="#dc3545", hover_color="#c82333")
+        btn_delete.pack(pady=10, fill='x', padx=20)
 
         # Botão Configurações
-        btn_settings = ctk.CTkButton(button_frame, text="Configurações", command=self.open_settings_screen)
-        btn_settings.pack(pady=10)
+        btn_settings = ctk.CTkButton(button_frame, text="Configurações", command=self.open_settings_screen,
+                                     fg_color="#6c757d", hover_color="#5a6268")
+        btn_settings.pack(pady=10, fill='x', padx=20)
 
 
     def open_create_client_screen(self):
